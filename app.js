@@ -3,6 +3,7 @@ const session = require('express-session');
 const app = express();
 const port = 3000;
 
+// Lista zadań (pytania do losowania)
 const tasks = [
     ["1. Decyzyjny problem plecakowy", "BS", "DZ", "SO", "AZ"],
     ["2. Ogólny problem plecakowy", "BS", "DZ", "SO"],
@@ -28,7 +29,7 @@ const tasks = [
 const maksymalnaLiczbaOsob = 10;
 
 app.use(session({
-    secret: 'sekretnyKlucz',
+    secret: 'sekretnyKlucz', // Klucz do szyfrowania sesji
     resave: false,
     saveUninitialized: true
 }));
@@ -36,6 +37,7 @@ app.use(session({
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
+// Funkcja losująca dwa unikalne zadania
 function losujDwaZadania() {
     const wylosowaneZadania = [];
     while (wylosowaneZadania.length < 2) {
@@ -55,12 +57,15 @@ function losujDwaZadania() {
 function resetSession(req) {
     req.session.history = [];
     req.session.indexOsoby = 0;
+    req.session.completed = false;
 }
 
 app.get('/', (req, res) => {
-    if (!req.session.history || req.session.indexOsoby >= maksymalnaLiczbaOsob) {
-        resetSession(req);
+    if (!req.session.history) {
+        req.session.history = [];
+        req.session.indexOsoby = 0;
     }
+
     res.render('index', { history: req.session.history, osoba: req.session.indexOsoby < maksymalnaLiczbaOsob });
 });
 
@@ -77,7 +82,6 @@ app.get('/losuj', (req, res) => {
     }
 });
 
-// Endpoint do resetowania sesji
 app.get('/reset', (req, res) => {
     resetSession(req);
     res.redirect('/');
