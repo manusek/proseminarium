@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Losowanie Zadań</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Losowanie zadań</h1>
+    
+    <% if (typeof history === 'string') { %>
+        <p><%= history %></p>
+    <% } else { %>
+        <div class="result">
+            <% history.forEach(item => { %>
+                <p><strong><%= item.osoba %>:</strong></p>
+                <p>Zadanie 1: <%= item.zadania[0].nazwa %> <em>(<%= item.zadania[0].etykiety.join(", ") %>)</em></p>
+                <p>Zadanie 2: <%= item.zadania[1].nazwa %> <em>(<%= item.zadania[1].etykiety.join(", ") %>)</em></p>
+            <% }); %>
+        </div>
+    <% } %>
+
+    <% if (osoba) { %>
+        <form action="/losuj" method="get">
+            <button type="submit">Losuj</button>
+        </form>
+    <% } else { %>
+        <p>Osiągnięto maksymalną liczbę osób.</p>
+    <% } %>
+    
+    <form action="/reset" method="get">
+        <button type="submit">Resetuj losowanie</button>
+    </form>
+</body>
+</html>
