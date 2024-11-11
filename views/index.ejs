@@ -14,11 +14,11 @@
             <button type="submit">Losuj</button>
         </form>
     <% } else { %>
-        <p>Osiągnięto maksymalną liczbę osób.</p>
+        <p id="maksOsob">Osiągnięto maksymalną liczbę osób.</p>
     <% } %>
     
     <form action="/reset" method="get">
-        <button type="submit">Resetuj losowanie</button>
+        <button type="submit" id="resetStrony">Resetuj losowanie</button>
     </form>
 
     <% if (typeof history === 'string') { %>
@@ -32,5 +32,32 @@
             <% }); %>
         </div>
     <% } %>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const maksOsob = document.getElementById('maksOsob');
+            const resetButton = document.getElementById('resetStrony');
+    
+            // Funkcja do wykrywania, czy element jest widoczny
+            const isElementVisible = (el) => el && el.offsetParent !== null;
+    
+            // Po załadowaniu strony sprawdzamy, czy w localStorage jest informacja o osiągnięciu maksymalnej liczby osób
+            if (localStorage.getItem('maxUsersReached') === 'true') {
+                // Klikamy przycisk resetu (symulujemy kliknięcie przycisku)
+                resetButton.click();
+    
+                // Usuwamy informację z localStorage, aby nie klikało przycisku resetu przy każdym załadowaniu strony
+                localStorage.removeItem('maxUsersReached');
+            }
+
+            // Jeżeli komunikat "Osiągnięto maksymalną liczbę osób" jest widoczny,
+            // zapisujemy w localStorage, że użytkownik widział ten komunikat
+            if (isElementVisible(maksOsob)) {
+                localStorage.setItem('maxUsersReached', 'true');
+            }
+        });
+    </script>
+    
+    
 </body>
 </html>
