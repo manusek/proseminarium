@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Losowanie Zadań</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Losowanie zadań</h1>
+    
+    <div class="result" id="result"></div>
+
+    <script>
+        // Lista zadań (pytania do losowania)
+        const tasks = [
+            ["1. Decyzyjny problem plecakowy", "BS", "DZ", "SO", "AZ"],
+            ["2. Ogólny problem plecakowy", "BS", "DZ", "SO"],
+            ["4. Problem doboru załogi statku kosmicznego", "BS", "SO"],
+            ["6. Problem odgadywania liczby", "DZ", "MC", "BS", "EX"],
+            ["7. Problem planowania produkcji mebli", "SO"],
+            ["8. Problem planowania diety dziecka", "SO"],
+            ["9. Problem planowania zawartości zestawu paszowego", "SO"],
+            ["10. Problem czterech hetmanów", "SO", "GT"],
+            ["11. Problem planowania liczebności klas", "BS", "SO"],
+            ["12. Problem wysyłania pociągów", "SO"],
+            ["13. Problem przydziału maszyn", "BS", "SO"],
+            ["14. Problem transportu węgla", "SO"],
+            ["15. Problem transportu produktów", "SO"],
+            ["16. Problem produkcji samochodów", "BS", "SO"],
+            ["17. Problem transportu koni", "SO"],
+            ["20. Problem przewidywania liczebności populacji królików", "DZ", "EX", "PD"],
+            ["21. Problem przewidywania wzrostu PKB", "EX", "PROGRAM"],
+            ["22. Problem przewidywania oprocentowania od lokaty", "EX", "PROGRAM"],
+            ["28. Problem wydawania reszty", "AZ", "SO"]
+        ];
+
+        let indexOsoby = 0; // Indeks osoby, początkowo ustawiony na 0
+        const maksymalnaLiczbaOsob = 10; // Maksymalna liczba osób
+
+        // Funkcja losująca dwa zadania i przypisująca je do kolejnej osoby
+        function losujZadania() {
+            const wynikDiv = document.getElementById('result');
+
+            // Sprawdzenie, czy nie przekroczono limitu osób
+            if (indexOsoby < maksymalnaLiczbaOsob) {
+                const osoba = `Osoba ${indexOsoby + 1}`;
+                const wylosowaneZadania = losujDwaZadania();
+
+                // Tworzymy nowy div z wynikami dla aktualnej osoby
+                const osobaDiv = document.createElement('div');
+                osobaDiv.innerHTML = `<strong>${osoba}:</strong><br> 
+                    Zadanie 1: ${wylosowaneZadania[0].nazwa} <em>(${wylosowaneZadania[0].etykiety.join(", ")})</em><br>
+                    Zadanie 2: ${wylosowaneZadania[1].nazwa} <em>(${wylosowaneZadania[1].etykiety.join(", ")})</em><br><br>`;
+                
+                wynikDiv.appendChild(osobaDiv); // Dodajemy wyniki do głównego kontenera
+                indexOsoby++; // Zwiększamy indeks osoby, aby następnym razem wybrać kolejną osobę
+            } else {
+                alert("Osiągnięto maksymalną liczbę 10 osób.");
+            }
+        }
+
+        // Funkcja losująca dwa unikalne zadania
+        function losujDwaZadania() {
+            const wylosowaneZadania = [];
+            while (wylosowaneZadania.length < 2) {
+                const losowyIndeks = Math.floor(Math.random() * tasks.length);
+                const zadanie = tasks[losowyIndeks];
+                const nazwaZadania = zadanie[0];
+                const etykietyZadania = zadanie.slice(1);
+
+                const zadanieObj = { nazwa: nazwaZadania, etykiety: etykietyZadania };
+
+                // Sprawdzamy, czy zadanie już nie zostało wylosowane
+                if (!wylosowaneZadania.some(z => z.nazwa === zadanieObj.nazwa)) {
+                    wylosowaneZadania.push(zadanieObj);
+                }
+            }
+            return wylosowaneZadania;
+        }
+    </script>
+    <button onclick="losujZadania()">Losuj</button>
+</body>
+</html>
