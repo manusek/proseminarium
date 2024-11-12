@@ -36,4 +36,4 @@ fi
 
 # Uruchamiamy aplikację
 echo "Uruchamiam aplikację..."
-node app.js
+node ../app.js
