@@ -9,24 +9,23 @@
 <body>
     <h1>Losowanie zadań</h1>
     
-    <% if (osoba) { %>
-        <form action="/losuj" method="get">
-            <button type="submit">Losuj</button>
-        </form>
-    <% } else { %>
-        <p id="maksOsob">Osiągnięto maksymalną liczbę osób.</p>
-    <% } %>
     
+    
+    <!-- nie powinno byc tego guzika do resetowania tylko po wylosowaniu wszystkich pytan wciskac F5 i od nowa xd-->
     <form action="/reset" method="get">
         <button type="submit" id="resetStrony">Resetuj losowanie</button>
     </form>
-
+    <div class="container">
+        <div class="stats">
+            Excel: 19  Java:18
+        </div>
+    </div>
     <% if (typeof history === 'string') { %>
         <p><%= history %></p>
     <% } else { %>
         <div class="result">
             <% history.forEach(item => { %>
-                <p><strong><%= item.osoba %>:</strong></p>
+                <p><%= item.osoba %>:</p>
                 <p>Zadanie 1: <%= item.zadania[0].nazwa %> <em>(<%= item.zadania[0].etykiety.join(", ") %>)</em></p>
                 <p>Zadanie 2: <%= item.zadania[1].nazwa %> <em>(<%= item.zadania[1].etykiety.join(", ") %>)</em></p>
             <% }); %>
@@ -57,7 +56,13 @@
             }
         });
     </script>
-    
+    <% if (osoba) { %>
+        <form action="/losuj" method="get">
+            <button type="submit">Losuj zestaw</button>
+        </form>
+    <% } else { %>
+        <p id="maksOsob">Osiągnięto maksymalną liczbę osób.</p>
+    <% } %>
     
 </body>
 </html>

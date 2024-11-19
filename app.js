@@ -26,7 +26,7 @@ const tasks = [
     ["28. Problem wydawania reszty", "AZ", "SO"]
 ];
 
-const maksymalnaLiczbaOsob = 10;
+const maksymalnaLiczbaOsob = 18;
 
 app.use(session({
     secret: 'sekretnyKlucz', // Klucz do szyfrowania sesji

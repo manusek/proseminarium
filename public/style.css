@@ -4,16 +4,68 @@ body {
     margin: auto;
     padding: 20px;
     text-align: center;
+    background-color: white;
+}
+
+h1 {
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-right: 20px;
+    color: black;
+}
+
+.container {
+    border: 1px solid #ccc;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+header {
+    text-align: center;
+    font-weight: bold;
+    padding-bottom: 10px;
 }
 
 button {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 20px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    /* margin-top: 20px; */
+    transition: background-color 0.3s;
+    width: 100%;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #e0e0e0;
 }
 
 .result {
-    margin-top: 20px;
+    /* margin: 10px 0; */
+    border: 1px solid #ddd;
+    padding: 5px;
+    height: 100px;
+    overflow: auto;
+    background-color: white;
     text-align: left;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    
+}
+
+.stats {
+    /* border-bottom: 1px solid #ccc; */
+    padding: 5px;
+    font-weight: bold;
+    /* background-color: #f1f1f1; */
+    text-align: center;
+}
+#resetStrony {
+    opacity: 0;
+    pointer-events: none; /* Opcjonalne: uniemożliwia kliknięcie */
 }
