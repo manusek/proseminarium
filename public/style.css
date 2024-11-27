@@ -35,7 +35,6 @@ button {
     cursor: pointer;
     background-color: #f1f1f1;
     border: 1px solid #ccc;
-    /* margin-top: 20px; */
     transition: background-color 0.3s;
     width: 100%;
     font-weight: bold;
@@ -46,26 +45,32 @@ button:hover {
 }
 
 .result {
-    /* margin: 10px 0; */
     border: 1px solid #ddd;
     padding: 5px;
-    height: 100px;
+    height: 150px;
     overflow: auto;
     background-color: white;
     text-align: left;
     font-family: Arial, sans-serif;
     font-size: 14px;
+    max-height: 200px; /* Ustaw widoczną wysokość */
+    overflow-y: auto; /* Dodaj przewijanie w pionie */
     
 }
 
 .stats {
-    /* border-bottom: 1px solid #ccc; */
     padding: 5px;
     font-weight: bold;
-    /* background-color: #f1f1f1; */
     text-align: center;
 }
 #resetStrony {
     opacity: 0;
-    pointer-events: none; /* Opcjonalne: uniemożliwia kliknięcie */
+    pointer-events: none; 
+}
+p {
+    margin: 0; 
+    padding: 0;
+}
+.entry {
+    margin-bottom: 15px;
 }

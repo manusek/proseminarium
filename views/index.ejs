@@ -7,11 +7,8 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <h1>Losowanie zadań</h1>
+    <h1>IRZ</h1>
     
-    
-    
-    <!-- nie powinno byc tego guzika do resetowania tylko po wylosowaniu wszystkich pytan wciskac F5 i od nowa xd-->
     <form action="/reset" method="get">
         <button type="submit" id="resetStrony">Resetuj losowanie</button>
     </form>
@@ -23,14 +20,30 @@
     <% if (typeof history === 'string') { %>
         <p><%= history %></p>
     <% } else { %>
-        <div class="result">
+        <!-- <div class="result">
             <% history.forEach(item => { %>
                 <p><%= item.osoba %>:</p>
                 <p>Zadanie 1: <%= item.zadania[0].nazwa %> <em>(<%= item.zadania[0].etykiety.join(", ") %>)</em></p>
                 <p>Zadanie 2: <%= item.zadania[1].nazwa %> <em>(<%= item.zadania[1].etykiety.join(", ") %>)</em></p>
             <% }); %>
         </div>
-    <% } %>
+    <% } %> -->
+
+    <div id="resultContainer" class="result">
+        <% history.forEach((entry) => { %>
+            <div class="entry">
+                <%= entry.osoba %>
+                <% entry.zadania.forEach((zadanie) => { %>
+                    <div class="task">
+                        <%= zadanie.nazwa %>
+                        <% zadanie.etykiety.forEach((etykieta) => { %>
+                            <span class="tag"><%= etykieta %></span>
+                        <% }); %>
+                    </div>
+                <% }); %>
+            </div>
+        <% }); %>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -54,6 +67,10 @@
             if (isElementVisible(maksOsob)) {
                 localStorage.setItem('maxUsersReached', 'true');
             }
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const resultContainer = document.getElementById("resultContainer");
+            resultContainer.scrollTop = resultContainer.scrollHeight;
         });
     </script>
     <% if (osoba) { %>
