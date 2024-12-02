@@ -1,9 +1,9 @@
-const express = require('express');
-const session = require('express-session');
-const app = express();
-const port = process.env.PORT || 3000;
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const url = require('url');
 
-// Lista zadań (pytania do losowania)
+// Lista zadań
 const tasks = [
     ["1. Decyzyjny problem plecakowy", "BS", "DZ", "SO", "AZ"],
     ["2. Ogólny problem plecakowy", "BS", "DZ", "SO"],
@@ -26,67 +26,99 @@ const tasks = [
     ["28. Problem wydawania reszty", "AZ", "SO"]
 ];
 
-const maksymalnaLiczbaOsob = 18;
+let tasksExcel = [];
+let tasksJava = [];
+let student = 1;
 
-app.use(session({
-    secret: 'sekretnyKlucz', // Klucz do szyfrowania sesji
-    resave: false,
-    saveUninitialized: true
-}));
+// Inicjalizacja list zadań
+function initializeTasks() {
+    tasksExcel = [];
+    tasksJava = [];
+    student = 1;
 
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-
-// Funkcja losująca dwa unikalne zadania
-function losujDwaZadania() {
-    const wylosowaneZadania = [];
-    while (wylosowaneZadania.length < 2) {
-        const losowyIndeks = Math.floor(Math.random() * tasks.length);
-        const zadanie = tasks[losowyIndeks];
-        const nazwaZadania = zadanie[0];
-        const etykietyZadania = zadanie.slice(1);
-        const zadanieObj = { nazwa: nazwaZadania, etykiety: etykietyZadania };
-
-        if (!wylosowaneZadania.some(z => z.nazwa === zadanieObj.nazwa)) {
-            wylosowaneZadania.push(zadanieObj);
+    for (let i = 0; i < tasks.length; i++) {
+        for (let j = 1; j < tasks[i].length; j++) {
+            const type = tasks[i][j];
+            if (type === "EX" || type === "SO") {
+                tasksExcel.push(tasks[i][0] + "  " + type);
+            } else {
+                tasksJava.push(tasks[i][0] + "  " + type);
+            }
         }
     }
-    return wylosowaneZadania;
 }
 
-function resetSession(req) {
-    req.session.history = [];
-    req.session.indexOsoby = 0;
-    req.session.completed = false;
-}
+initializeTasks();
 
-app.get('/', (req, res) => {
-    if (!req.session.history) {
-        req.session.history = [];
-        req.session.indexOsoby = 0;
-    }
+const server = http.createServer((req, res) => {
+    const parsedUrl = url.parse(req.url, true);
+    const pathname = parsedUrl.pathname;
 
-    res.render('index', { history: req.session.history, osoba: req.session.indexOsoby < maksymalnaLiczbaOsob });
-});
+    if (pathname === '/') {
+        // Renderowanie strony głównej
+        fs.readFile(path.join(__dirname, 'public', 'index.html'), 'utf-8', (err, content) => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Internal Server Error');
+                return;
+            }
 
-app.get('/losuj', (req, res) => {
-    if (req.session.indexOsoby < maksymalnaLiczbaOsob) {
-        const osoba = `Osoba ${req.session.indexOsoby + 1}`;
-        const wylosowaneZadania = losujDwaZadania();
-        req.session.history.push({ osoba, zadania: wylosowaneZadania });
-        req.session.indexOsoby++;
+            const excelCount = tasksExcel.length;
+            const javaCount = tasksJava.length;
 
-        res.redirect('/');
+            const rendered = content
+                .replace('{{excelCount}}', excelCount)
+                .replace('{{javaCount}}', javaCount)
+                .replace('{{textarea}}', '');
+
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(rendered);
+        });
+    } else if (pathname === '/losuj') {
+        // Losowanie zadania
+        if (tasksExcel.length > 0 && tasksJava.length > 0) {
+            const excelIndex = Math.floor(Math.random() * tasksExcel.length);
+            const javaIndex = Math.floor(Math.random() * tasksJava.length);
+
+            const excelTask = tasksExcel.splice(excelIndex, 1);
+            const javaTask = tasksJava.splice(javaIndex, 1);
+
+            const response = {
+                student,
+                javaTask: javaTask[0],
+                excelTask: excelTask[0]
+            };
+
+            student++;
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(response));
+        } else {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Brak dostępnych zadań!' }));
+        }
+    } else if (pathname.startsWith('/public/')) {
+        // Serwowanie plików statycznych
+        const filePath = path.join(__dirname, pathname);
+        fs.readFile(filePath, (err, data) => {
+            if (err) {
+                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.end('Not Found');
+                return;
+            }
+            const ext = path.extname(filePath).toLowerCase();
+            const mimeTypes = {
+                '.css': 'text/css',
+                '.js': 'application/javascript',
+            };
+            res.writeHead(200, { 'Content-Type': mimeTypes[ext] || 'application/octet-stream' });
+            res.end(data);
+        });
     } else {
-        res.render('index', { history: req.session.history, osoba: false, error: "Osiągnięto maksymalną liczbę 10 osób." });
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found');
     }
 });
 
-app.get('/reset', (req, res) => {
-    resetSession(req);
-    res.redirect('/');
-});
-
-app.listen(port, () => {
-    console.log(`Serwer działa na http://localhost:${port}`);
+server.listen(3000, () => {
+    console.log('Serwer działa na http://localhost:3000');
 });
