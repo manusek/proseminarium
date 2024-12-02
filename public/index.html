@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>IRZ</title>
+<link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+<h2 class="center">IRZ</h2>
+<div>
+    <p id="head">Excel: {{excelCount}} &nbsp;Java: {{javaCount}}</p>
+    <textarea id="textarea" disabled>{{textarea}}</textarea>
+    <button type="button" id="losujButton">Losuj zestaw</button>
+</div>
+<script>
+document.getElementById('losujButton').addEventListener('click', () => {
+    fetch('/losuj', { method: 'GET' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                const textarea = document.getElementById('textarea');
+                textarea.value += `Osoba ${data.student}:\n${data.javaTask}\n${data.excelTask}\n\n`;
+                textarea.scrollTop = textarea.scrollHeight;
+
+                const excelCount = document.getElementById('head');
+                excelCount.innerHTML = `Excel: ${data.excelCount} &nbsp;Java: ${data.javaCount}`;
+            }
+        });
+});
+</script>
+</body>
+</html>
