@@ -30,13 +30,15 @@ let tasksExcel = [];
 let tasksJava = [];
 let drawnTasks = [];
 let student = 1;
+let isResetPending = false;
 
 // Inicjalizacja list zadań
 function initializeTasks() {
     tasksExcel = [];
     tasksJava = [];
-    student = 1;
     drawnTasks = [];
+    student = 1;
+    isResetPending = false;
 
     for (let i = 0; i < tasks.length; i++) {
         for (let j = 1; j < tasks[i].length; j++) {
@@ -78,33 +80,38 @@ const server = http.createServer((req, res) => {
         });
     } else if (pathname === '/losuj') {
         // Losowanie zadania
-        if (tasksExcel.length > 0 && tasksJava.length > 0) {
+        let response = {};
+        if (isResetPending) {
+            // Reset widoku i rozpoczęcie nowego cyklu
+            initializeTasks();
+            response.wasReset = true;
+        } else if (tasksExcel.length > 0 && tasksJava.length > 0) {
             const excelIndex = Math.floor(Math.random() * tasksExcel.length);
             const javaIndex = Math.floor(Math.random() * tasksJava.length);
 
             const excelTask = tasksExcel.splice(excelIndex, 1)[0];
             const javaTask = tasksJava.splice(javaIndex, 1)[0];
 
-            const response = {
+            response = {
                 student,
                 javaTask,
-                excelTask
+                excelTask,
+                wasReset: false
             };
 
             drawnTasks.push(response);
             student++;
 
-            // Reset, jeśli wylosowano 18 zadań
+            // Oznaczenie końca cyklu po pytaniu nr 18
             if (drawnTasks.length >= 18) {
-                initializeTasks();
+                isResetPending = true;
             }
-
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(response));
         } else {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: 'Brak dostępnych zadań!' }));
+            response.error = 'Brak dostępnych zadań!';
         }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(response));
     } else if (pathname.startsWith('/public/')) {
         // Serwowanie plików statycznych
         const filePath = path.join(__dirname, pathname);
