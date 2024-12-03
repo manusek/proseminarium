@@ -28,6 +28,7 @@ const tasks = [
 
 let tasksExcel = [];
 let tasksJava = [];
+let drawnTasks = [];
 let student = 1;
 
 // Inicjalizacja list zadań
@@ -35,6 +36,7 @@ function initializeTasks() {
     tasksExcel = [];
     tasksJava = [];
     student = 1;
+    drawnTasks = [];
 
     for (let i = 0; i < tasks.length; i++) {
         for (let j = 1; j < tasks[i].length; j++) {
@@ -69,7 +71,7 @@ const server = http.createServer((req, res) => {
             const rendered = content
                 .replace('{{excelCount}}', excelCount)
                 .replace('{{javaCount}}', javaCount)
-                .replace('{{textarea}}', '');
+                .replace('{{textarea}}', drawnTasks.map(task => `Osoba ${task.student}:\n${task.javaTask}\n${task.excelTask}\n\n`).join(''));
 
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(rendered);
@@ -80,16 +82,23 @@ const server = http.createServer((req, res) => {
             const excelIndex = Math.floor(Math.random() * tasksExcel.length);
             const javaIndex = Math.floor(Math.random() * tasksJava.length);
 
-            const excelTask = tasksExcel.splice(excelIndex, 1);
-            const javaTask = tasksJava.splice(javaIndex, 1);
+            const excelTask = tasksExcel.splice(excelIndex, 1)[0];
+            const javaTask = tasksJava.splice(javaIndex, 1)[0];
 
             const response = {
                 student,
-                javaTask: javaTask[0],
-                excelTask: excelTask[0]
+                javaTask,
+                excelTask
             };
 
+            drawnTasks.push(response);
             student++;
+
+            // Reset, jeśli wylosowano 18 zadań
+            if (drawnTasks.length >= 18) {
+                initializeTasks();
+            }
+
             res.writeHead(200, { 'Content-Type': 'application/json' });
             res.end(JSON.stringify(response));
         } else {
